@@ -9,7 +9,7 @@ module.exports = {
     filename: 'index.js'
   },
   resolve: {
-    extensions: [".js", ".json"]
+    extensions: ['.js', '.json']
   },
   module: {
     rules: [
@@ -20,18 +20,24 @@ module.exports = {
       {
         test: /\.js$/,
         exclude: /node_modules/,
-        loader: "babel-loader"
+        loader: 'babel-loader'
       },
       {
         test: /\.(png|jpg)$/,
         loader: 'url-loader'
       },
-      {enforce: "pre", test: /\.js$/, loader: "source-map-loader"}
+      {enforce: 'pre', test: /\.js$/, loader: 'source-map-loader'}
     ]
   },
   plugins: [
     new HtmlWebpackPlugin({
       template: path.resolve(home, 'assets/index.html')
     })
-  ]
+  ],
+  target: 'web',
+  node: {
+    __dirname: true,
+    fs: 'empty',
+    module: 'empty',
+  },
 };

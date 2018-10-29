@@ -92,7 +92,7 @@ export default class VideoDemo extends React.Component {
           </video>
         }
         {
-          addIndex(map)(([startTime, endTime], index) => <div>
+          addIndex(map)(([startTime, endTime], index) => <div key={index}>
             [{index}]
             <input type="text" value={startTime} onChange={(e) => this._onUpdateTime(e, index, true)}/>
             <input type="text" value={endTime} onChange={(e) => this._onUpdateTime(e, index, false)}/>

@@ -5,7 +5,7 @@
   "main": "",
   "browserslist": "> 0.25%, not dead",
   "scripts": {
-    "dev": "webpack-serve webpack/webpack.dev.config.js",
+    "dev": "webpack-dev-server --config webpack/webpack.dev.config.js",
     "lint": "tslint src/**/*.ts{,x}",
     "test": "mocha -r ts-node/register src/**/*.test.ts server/**/*.test.ts",
     "serve": "ts-node server/app.ts"
@@ -55,6 +55,6 @@
     "url-loader": "^1.1.2",
     "webpack": "^4.16.5",
     "webpack-cli": "^3.1.0",
-    "webpack-serve": "^2.0.2"
+    "webpack-dev-server": "^3.1.10"
   }
 }
