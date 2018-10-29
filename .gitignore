@@ -1,0 +1,9 @@
+# Created by .ignore support plugin (hsz.mobi)
+node_modules
+
+# Cruft
+.DS_Store
+npm-debug.log
+.idea
+
+dist
