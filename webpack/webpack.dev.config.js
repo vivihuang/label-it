@@ -8,7 +8,7 @@ module.exports = {
     contentBase: path.join(__dirname, 'dist'),
     compress: true,
     historyApiFallback: true,
-    port: 8080,
+    port: 40021,
   },
   ...webpackConfig,
 };
