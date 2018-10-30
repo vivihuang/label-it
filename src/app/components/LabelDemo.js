@@ -158,12 +158,21 @@ export default class LabelDemo extends React.Component {
       body: formData,
       mode: "cors"
     }).then(res => res.json())
-        .then(response => this._updatePreLabeledBoxes(response))
-        .catch(err => console.error('Error:', err));
+        .then(response => this._updatePreLabeledBoxes(response));
   }
 
   _updatePreLabeledBoxes = (boxesArray) => {
-
+    console.log(boxesArray[0])
+    const boxes = boxesArray.map(box => {
+      return {
+        id: uuid(),
+        type: 'RECTANGLE',
+        shape: box
+      }
+    })
+    this.setState({
+      layers: this.state.layers.concat(boxes)
+    })
   }
 
   render() {
