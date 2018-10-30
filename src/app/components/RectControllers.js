@@ -53,9 +53,9 @@ class RectControllers extends React.Component {
           height={shape[3]}
           style={{
             ...style,
-            fill: 'rgb(0,0,255)',
+            fill: 'none',
             strokeWidth: 3,
-            stroke: 'rgb(0, 0, 0)'
+            stroke: 'red'
           }}
         />,
         <g fill="white" stroke="#333" strokeWidth="1">
