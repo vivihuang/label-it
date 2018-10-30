@@ -23,7 +23,8 @@ export default class LabelDemo extends React.Component {
         type: 'RECTANGLE',
       },
       layers: [],
-      editMode: false
+      editMode: false,
+      preLabelURL: 'http://localhost:40022/detect'
     };
 
     this.points = [];
@@ -40,6 +41,9 @@ export default class LabelDemo extends React.Component {
   _onSelectFile = (e) => {
     const img = new Image();
     const file = URL.createObjectURL(e.target.files[0]);
+    this.setState({
+      imageFile: e.target.files[0]
+    });
 
     img.src = file;
     img.onload = () => {
@@ -146,6 +150,22 @@ export default class LabelDemo extends React.Component {
     })
   }
 
+  _onPreLabel = () => {
+    const formData = new FormData();
+    formData.append('image', this.state.imageFile);
+    fetch(this.state.preLabelURL, {
+      method: 'POST',
+      body: formData,
+      mode: "cors"
+    }).then(res => res.json())
+        .then(response => this._updatePreLabeledBoxes(response))
+        .catch(err => console.error('Error:', err));
+  }
+
+  _updatePreLabeledBoxes = (boxesArray) => {
+
+  }
+
   render() {
     const {file, width, height, scale, image} = this.state;
     return (
@@ -158,6 +178,7 @@ export default class LabelDemo extends React.Component {
         </div>
         <div>
           <input type="file" onChange={this._onSelectFile} />
+          <button onClick={this._onPreLabel}>Pre-label</button>
           <input type="checkbox" name="editable" onChange={this._onEditChange}/> edit mode
         </div>
         <svg
