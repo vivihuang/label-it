@@ -26,6 +26,15 @@ export default class LabelDemo extends React.Component {
       editMode: false,
       preLabelURL: 'http://twdp-saledemo:40022/detect',
       drawMode: false,
+      dragMode: false,
+      startPos: {
+        x: '',
+        y: '',
+      },
+      endPos: {
+        x: '',
+        y: '',
+      }
     };
 
     this.points = [];
@@ -105,46 +114,76 @@ export default class LabelDemo extends React.Component {
 
   _onMouseDown = (e) => {
     if (this.state.editMode) return;
+    const cursorPos = this._getCursorPos(e);
     if (this.state.drawMode) {
       this.setState({
         living: {
           ...this.state.living,
-          points: [...this._getCursorPos(e), ...this._getCursorPos(e)],
+          points: [...cursorPos, ...cursorPos],
         },
       });
+    } else {
+      this.setState({
+        dragMode: true,
+        startPos: {
+          x: cursorPos[0],
+          y: cursorPos[1]
+        }
+      })
     }
   };
 
   _onMouseMove = (e) => {
-    if (!this.state.living.points) return;
+    if (!this.state.living.points && this.state.drawMode) return;
 
     const cursorPos = this._getCursorPos(e);
-    const startPos = this.state.living.points.slice(0, 2);
-    this.setState({
-      living: {
-        ...this.state.living,
-        points: [...startPos, ...cursorPos],
-      },
-    });
+    if (this.state.drawMode) {
+      const startPos = this.state.living.points.slice(0, 2);
+      this.setState({
+        living: {
+          ...this.state.living,
+          points: [...startPos, ...cursorPos],
+        },
+      });
+    } else if (this.state.dragMode) {
+      if (this.state.startPos.x && this.state.startPos.y) {
+        this. setState({
+          image: {
+            x: cursorPos[0] - this.state.startPos.x,
+            y: cursorPos[1] - this.state.startPos.y
+          }
+        })
+      }
+    }
   };
 
   _onMouseUp = (e) => {
-    if (!this.state.living.points) return;
+    if (!this.state.living.points && this.state.drawMode) return;
 
     const cursorPos = this._getCursorPos(e);
-    const startPos = this.state.living.points.slice(0, 2);
-    const livingObject = {
-      type: this.state.living.type,
-      id: uuid(),
-      shape: normalize(...startPos, ...cursorPos),
-    };
+    if (this.state.drawMode) {
+      const startPos = this.state.living.points.slice(0, 2);
+      const livingObject = {
+        type: this.state.living.type,
+        id: uuid(),
+        shape: normalize(...startPos, ...cursorPos),
+      };
 
-    this.setState({
-      living: {
-        type: 'RECTANGLE',
-      },
-      layers: [...this.state.layers, livingObject],
-    });
+      this.setState({
+        living: {
+          type: 'RECTANGLE',
+        },
+        layers: [...this.state.layers, livingObject],
+      });
+    } else {
+      this.setState({
+        dragMode: false,
+        image: {
+          x: cursorPos[0] - this.state.startPos.x,
+          y: cursorPos[1] - this.state.startPos.y
+        }
+      })
+    }
   };
 
   _onUpdateShape = (id, shape) => {
@@ -177,7 +216,6 @@ export default class LabelDemo extends React.Component {
   };
 
   _updatePreLabeledBoxes = (boxesArray) => {
-    console.log(boxesArray[0]);
     const boxes = boxesArray.map(box => {
       return {
         id: uuid(),
