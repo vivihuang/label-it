@@ -5,7 +5,7 @@ import { normalize, getCornerPoint, getDiagonalPoint, CENTER } from '../../util/
 import uuid from 'uuid';
 
 const MAX_SCALE = 2;
-const MIN_SCALE = 0.5;
+const MIN_SCALE = 1;
 
 export default class LabelDemo extends React.Component {
   constructor() {
@@ -92,6 +92,10 @@ export default class LabelDemo extends React.Component {
     }
   }
 
+  _calcDragShape(shape) {
+    return [shape[0] + this.state.image.x, shape[1] + this.state.image.y, shape[2], shape[3]]
+  }
+
   _getCursorPos(e) {
     const svgRects = this._svg.current.getClientRects()[0];
     return [e.pageX - svgRects.x, e.pageY - svgRects.y];
@@ -159,6 +163,10 @@ export default class LabelDemo extends React.Component {
     } else if (this.state.dragMode) {
       this.setState({
         image: this._calcDragPos(cursorPos),
+        layers: map((s) => ({
+          ...s,
+          shape: this._calcDragShape(s.startShape)
+        }), this.state.layers),
       });
     }
   };
@@ -185,11 +193,16 @@ export default class LabelDemo extends React.Component {
       this.setState({
         dragMode: false,
         image: this._calcDragPos(cursorPos),
+        layers: map((s) => ({
+          ...s,
+          shape: this._calcDragShape(s.startShape)
+        }), this.state.layers),
       });
     }
   };
 
   _onUpdateShape = (id, shape) => {
+    console.log(id, shape)
     const index = findIndex(propEq('id', id), this.state.layers);
 
     this.setState({
@@ -224,6 +237,7 @@ export default class LabelDemo extends React.Component {
         id: uuid(),
         type: 'RECTANGLE',
         shape: box,
+        startShape: box,
       };
     });
     this.setState({
