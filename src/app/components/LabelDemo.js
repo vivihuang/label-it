@@ -237,8 +237,9 @@ export default class LabelDemo extends React.Component {
       <div>
         <div>
           <ol>
-            <li>点击下方空白区域，拖动绘制矩形</li>
+            <li>点击下方空白区域，勾选draw mode后可拖动绘制矩形</li>
             <li>勾选edit mode可编辑已创建的矩形</li>
+            <li>在图片内拖动及滚动鼠标可实现图片的缩放</li>
           </ol>
         </div>
         <div>
