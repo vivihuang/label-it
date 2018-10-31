@@ -24,7 +24,7 @@ export default class LabelDemo extends React.Component {
       },
       layers: [],
       editMode: false,
-      preLabelURL: 'http://localhost:40022/detect'
+      preLabelURL: 'http://twdp-saledemo:40022/detect'
     };
 
     this.points = [];
