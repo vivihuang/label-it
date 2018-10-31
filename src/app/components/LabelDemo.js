@@ -25,6 +25,7 @@ export default class LabelDemo extends React.Component {
       layers: [],
       editMode: false,
       preLabelURL: 'http://twdp-saledemo:40022/detect',
+      drawMode: false,
     };
 
     this.points = [];
@@ -35,6 +36,12 @@ export default class LabelDemo extends React.Component {
   _onEditChange = (e) => {
     this.setState({
       editMode: e.target.checked,
+    });
+  };
+
+  _onDrawChange = (e) => {
+    this.setState({
+      drawMode: e.target.checked,
     });
   };
 
@@ -57,9 +64,9 @@ export default class LabelDemo extends React.Component {
     };
   };
 
-  _calcPos(e, scale, { x, y }) {
+  _calcPos(e, ratio = 1) {
+    const { x, y } = this.state.image;
     const svgRects = this._svg.current.getClientRects()[0];
-    const ratio = 1 - scale / this.state.scale;
     const cursorX = e.pageX - svgRects.x - x;
     const cursorY = e.pageY - svgRects.y - y;
 
@@ -75,32 +82,37 @@ export default class LabelDemo extends React.Component {
   }
 
   _onWheel = (e) => {
-    let scale = this.state.scale;
+    if (!this.state.drawMode) {
+      let scale = this.state.scale;
 
-    if (e.deltaY > 0) {
-      scale += 0.03;
-    } else if (e.deltaY < 0) {
-      scale -= 0.03;
+      if (e.deltaY < 0) {
+        scale += 0.03;
+      } else if (e.deltaY > 0) {
+        scale -= 0.03;
+      }
+
+      if (scale > MAX_SCALE) scale = MAX_SCALE;
+      else if (scale < MIN_SCALE) scale = MIN_SCALE;
+
+      const ratio = 1 - scale / this.state.scale;
+
+      this.setState({
+        scale,
+        image: this._calcPos(e, ratio),
+      });
     }
-
-    if (scale > MAX_SCALE) scale = MAX_SCALE;
-    else if (scale < MIN_SCALE) scale = MIN_SCALE;
-
-    this.setState({
-      scale,
-      image: this._calcPos(e, scale, this.state.image),
-    });
   };
 
   _onMouseDown = (e) => {
     if (this.state.editMode) return;
-
-    this.setState({
-      living: {
-        ...this.state.living,
-        points: [...this._getCursorPos(e), ...this._getCursorPos(e)],
-      },
-    });
+    if (this.state.drawMode) {
+      this.setState({
+        living: {
+          ...this.state.living,
+          points: [...this._getCursorPos(e), ...this._getCursorPos(e)],
+        },
+      });
+    }
   };
 
   _onMouseMove = (e) => {
@@ -191,12 +203,13 @@ export default class LabelDemo extends React.Component {
         <div>
           <input type="file" onChange={this._onSelectFile}/>
           <button onClick={this._onPreLabel}>Pre-label</button>
+          <input type="checkbox" name="drawable" onChange={this._onDrawChange}/> draw mode
           <input type="checkbox" name="editable" onChange={this._onEditChange}/> edit mode
         </div>
         <svg
           width={width}
           height={height}
-          // onWheel={this._onWheel}
+          onWheel={this._onWheel}
           onMouseDown={this._onMouseDown}
           onMouseUp={this._onMouseUp}
           onMouseMove={this._onMouseMove}
