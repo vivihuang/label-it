@@ -93,8 +93,8 @@ export default class LabelDemo extends React.Component {
     };
   }
 
-  _calcDragShape(shape) {
-    return [shape[0] + this.state.image.x, shape[1] + this.state.image.y, shape[2], shape[3]];
+  _calcDragShape(shape, cursorPos) {
+    return [shape[0] + cursorPos[0] - this.state.startPos.x, shape[1] + cursorPos[1] - this.state.startPos.y, shape[2], shape[3]];
   }
 
   _getCursorPos(e) {
@@ -116,11 +116,10 @@ export default class LabelDemo extends React.Component {
       else if (scale < MIN_SCALE) scale = MIN_SCALE;
 
       const ratio = scale / this.state.scale;
-      const imagePos = this._calcWheelPos(ratio);
 
       this.setState({
         scale,
-        image: imagePos,
+        image: this._calcWheelPos(ratio),
         layers: map((s) => ({
           ...s,
           shape: this._calcWheelShape(ratio, s.shape),
@@ -150,6 +149,10 @@ export default class LabelDemo extends React.Component {
           x: this.state.image.x,
           y: this.state.image.y,
         },
+        layers: map((s) => ({
+          ...s,
+          startShape: s.shape,
+        }), this.state.layers),
       });
     }
   };
@@ -171,7 +174,7 @@ export default class LabelDemo extends React.Component {
         image: this._calcDragPos(cursorPos),
         layers: map((s) => ({
           ...s,
-          shape: this._calcDragShape(s.startShape),
+          shape: this._calcDragShape(s.startShape, cursorPos),
         }), this.state.layers),
       });
     }
@@ -201,14 +204,13 @@ export default class LabelDemo extends React.Component {
         image: this._calcDragPos(cursorPos),
         layers: map((s) => ({
           ...s,
-          shape: this._calcDragShape(s.startShape),
+          shape: this._calcDragShape(s.startShape, cursorPos),
         }), this.state.layers),
       });
     }
   };
 
   _onUpdateShape = (id, shape) => {
-    console.log(id, shape);
     const index = findIndex(propEq('id', id), this.state.layers);
 
     this.setState({
