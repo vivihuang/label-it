@@ -194,9 +194,9 @@ export default class LabelDemo extends React.Component {
           <input type="checkbox" name="editable" onChange={this._onEditChange}/> edit mode
         </div>
         <svg
-          width="960"
-          height="720"
-          onWheel={this._onWheel}
+          width={width}
+          height={height}
+          // onWheel={this._onWheel}
           onMouseDown={this._onMouseDown}
           onMouseUp={this._onMouseUp}
           onMouseMove={this._onMouseMove}
