@@ -1,7 +1,7 @@
 import * as React from 'react';
 import Rectangle from './Rectangle';
-import {map, findIndex, propEq} from 'ramda';
-import {normalize, getCornerPoint, getDiagonalPoint, CENTER} from '../../util/rect';
+import { map, findIndex, propEq } from 'ramda';
+import { normalize, getCornerPoint, getDiagonalPoint, CENTER } from '../../util/rect';
 import uuid from 'uuid';
 
 const MAX_SCALE = 2;
@@ -13,7 +13,7 @@ export default class LabelDemo extends React.Component {
     this.state = {
       image: {
         x: 0,
-        y: 0
+        y: 0,
       },
       file: '',
       width: 0,
@@ -24,7 +24,7 @@ export default class LabelDemo extends React.Component {
       },
       layers: [],
       editMode: false,
-      preLabelURL: 'http://twdp-saledemo:40022/detect'
+      preLabelURL: 'http://twdp-saledemo:40022/detect',
     };
 
     this.points = [];
@@ -34,15 +34,15 @@ export default class LabelDemo extends React.Component {
 
   _onEditChange = (e) => {
     this.setState({
-      editMode: e.target.checked
+      editMode: e.target.checked,
     });
-  }
+  };
 
   _onSelectFile = (e) => {
     const img = new Image();
     const file = URL.createObjectURL(e.target.files[0]);
     this.setState({
-      imageFile: e.target.files[0]
+      imageFile: e.target.files[0],
     });
 
     img.src = file;
@@ -52,12 +52,12 @@ export default class LabelDemo extends React.Component {
       this.setState({
         file,
         width,
-        height
+        height,
       });
     };
-  }
+  };
 
-  _calcPos(e, scale, {x, y}) {
+  _calcPos(e, scale, { x, y }) {
     const svgRects = this._svg.current.getClientRects()[0];
     const ratio = 1 - scale / this.state.scale;
     const cursorX = e.pageX - svgRects.x - x;
@@ -65,13 +65,13 @@ export default class LabelDemo extends React.Component {
 
     return {
       x: x + (cursorX - x) * ratio,
-      y: y + (cursorY - y) * ratio
-    }
+      y: y + (cursorY - y) * ratio,
+    };
   }
 
   _getCursorPos(e) {
     const svgRects = this._svg.current.getClientRects()[0];
-    return [e.pageX - svgRects.x, e.pageY - svgRects.y]
+    return [e.pageX - svgRects.x, e.pageY - svgRects.y];
   }
 
   _onWheel = (e) => {
@@ -83,14 +83,14 @@ export default class LabelDemo extends React.Component {
       scale -= 0.03;
     }
 
-    if (scale > MAX_SCALE) scale = MAX_SCALE
-    else if (scale < MIN_SCALE) scale = MIN_SCALE
+    if (scale > MAX_SCALE) scale = MAX_SCALE;
+    else if (scale < MIN_SCALE) scale = MIN_SCALE;
 
     this.setState({
       scale,
-      image: this._calcPos(e, scale, this.state.image)
+      image: this._calcPos(e, scale, this.state.image),
     });
-  }
+  };
 
   _onMouseDown = (e) => {
     if (this.state.editMode) return;
@@ -98,10 +98,10 @@ export default class LabelDemo extends React.Component {
     this.setState({
       living: {
         ...this.state.living,
-        points: [...this._getCursorPos(e), ...this._getCursorPos(e)]
-      }
+        points: [...this._getCursorPos(e), ...this._getCursorPos(e)],
+      },
     });
-  }
+  };
 
   _onMouseMove = (e) => {
     if (!this.state.living.points) return;
@@ -111,10 +111,10 @@ export default class LabelDemo extends React.Component {
     this.setState({
       living: {
         ...this.state.living,
-        points: [...startPos, ...cursorPos]
-      }
-    })
-  }
+        points: [...startPos, ...cursorPos],
+      },
+    });
+  };
 
   _onMouseUp = (e) => {
     if (!this.state.living.points) return;
@@ -124,16 +124,16 @@ export default class LabelDemo extends React.Component {
     const livingObject = {
       type: this.state.living.type,
       id: uuid(),
-      shape: normalize(...startPos, ...cursorPos)
+      shape: normalize(...startPos, ...cursorPos),
     };
 
     this.setState({
       living: {
         type: 'RECTANGLE',
       },
-      layers: [...this.state.layers, livingObject]
-    })
-  }
+      layers: [...this.state.layers, livingObject],
+    });
+  };
 
   _onUpdateShape = (id, shape) => {
     const index = findIndex(propEq('id', id), this.state.layers);
@@ -143,40 +143,43 @@ export default class LabelDemo extends React.Component {
         ...this.state.layers.slice(0, index),
         {
           ...this.state.layers[index],
-          shape
+          shape,
         },
-        ...this.state.layers.slice(index + 1)
-      ]
-    })
-  }
+        ...this.state.layers.slice(index + 1),
+      ],
+    });
+  };
 
   _onPreLabel = () => {
-    const formData = new FormData();
-    formData.append('image', this.state.imageFile);
-    fetch(this.state.preLabelURL, {
-      method: 'POST',
-      body: formData,
-      mode: "cors"
-    }).then(res => res.json())
+    const { imageFile } = this.state;
+    if (imageFile) {
+      const formData = new FormData();
+      formData.append('image', imageFile);
+      fetch(this.state.preLabelURL, {
+        method: 'POST',
+        body: formData,
+        mode: "cors",
+      }).then(res => res.json())
         .then(response => this._updatePreLabeledBoxes(response));
-  }
+    }
+  };
 
   _updatePreLabeledBoxes = (boxesArray) => {
-    console.log(boxesArray[0])
+    console.log(boxesArray[0]);
     const boxes = boxesArray.map(box => {
       return {
         id: uuid(),
         type: 'RECTANGLE',
-        shape: box
-      }
-    })
+        shape: box,
+      };
+    });
     this.setState({
-      layers: this.state.layers.concat(boxes)
-    })
-  }
+      layers: this.state.layers.concat(boxes),
+    });
+  };
 
   render() {
-    const {file, width, height, scale, image} = this.state;
+    const { file, width, height, scale, image } = this.state;
     return (
       <div>
         <div>
@@ -186,7 +189,7 @@ export default class LabelDemo extends React.Component {
           </ol>
         </div>
         <div>
-          <input type="file" onChange={this._onSelectFile} />
+          <input type="file" onChange={this._onSelectFile}/>
           <button onClick={this._onPreLabel}>Pre-label</button>
           <input type="checkbox" name="editable" onChange={this._onEditChange}/> edit mode
         </div>
@@ -200,7 +203,7 @@ export default class LabelDemo extends React.Component {
           ref={this._svg}>
           <image xlinkHref={file} height={height * scale} width={width * scale} x={image.x} y={image.y}/>
           {
-            map((s) => <Rectangle 
+            map((s) => <Rectangle
               shape={s.shape}
               key={s.id}
               editMode={this.state.editMode}
@@ -209,8 +212,8 @@ export default class LabelDemo extends React.Component {
           }
           {
             this.state.living.type === 'RECTANGLE'
-              && this.state.living.points
-              && <Rectangle shape={normalize(...this.state.living.points)} />
+            && this.state.living.points
+            && <Rectangle shape={normalize(...this.state.living.points)}/>
           }
         </svg>
       </div>
