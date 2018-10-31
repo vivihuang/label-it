@@ -73,27 +73,28 @@ export default class LabelDemo extends React.Component {
     };
   };
 
-  _calcWheelPos(e, ratio = 1) {
-    const { x, y } = this.state.image;
-    const svgRects = this._svg.current.getClientRects()[0];
-    const cursorX = e.pageX - svgRects.x - x;
-    const cursorY = e.pageY - svgRects.y - y;
-
+  _calcWheelPos(ratio, x = this.state.image.x, y = this.state.image.y) {
+    const { width, height } = this.state;
     return {
-      x: x + (cursorX - x) * ratio,
-      y: y + (cursorY - y) * ratio,
+      x: ratio * x + (1 - ratio) * width / 2,
+      y: ratio * y + (1 - ratio) * height / 2,
     };
+  }
+
+  _calcWheelShape(ratio, shape) {
+    const position = this._calcWheelPos(ratio, shape[0], shape[1]);
+    return [position.x, position.y, shape[2] * ratio, shape[3] * ratio];
   }
 
   _calcDragPos(cursorPos) {
     return {
       x: this.state.imageStartPos.x + cursorPos[0] - this.state.startPos.x,
       y: this.state.imageStartPos.y + cursorPos[1] - this.state.startPos.y,
-    }
+    };
   }
 
   _calcDragShape(shape) {
-    return [shape[0] + this.state.image.x, shape[1] + this.state.image.y, shape[2], shape[3]]
+    return [shape[0] + this.state.image.x, shape[1] + this.state.image.y, shape[2], shape[3]];
   }
 
   _getCursorPos(e) {
@@ -114,11 +115,16 @@ export default class LabelDemo extends React.Component {
       if (scale > MAX_SCALE) scale = MAX_SCALE;
       else if (scale < MIN_SCALE) scale = MIN_SCALE;
 
-      const ratio = 1 - scale / this.state.scale;
+      const ratio = scale / this.state.scale;
+      const imagePos = this._calcWheelPos(ratio);
 
       this.setState({
         scale,
-        image: this._calcWheelPos(e, ratio),
+        image: imagePos,
+        layers: map((s) => ({
+          ...s,
+          shape: this._calcWheelShape(ratio, s.shape),
+        }), this.state.layers),
       });
     }
   };
@@ -165,7 +171,7 @@ export default class LabelDemo extends React.Component {
         image: this._calcDragPos(cursorPos),
         layers: map((s) => ({
           ...s,
-          shape: this._calcDragShape(s.startShape)
+          shape: this._calcDragShape(s.startShape),
         }), this.state.layers),
       });
     }
@@ -195,14 +201,14 @@ export default class LabelDemo extends React.Component {
         image: this._calcDragPos(cursorPos),
         layers: map((s) => ({
           ...s,
-          shape: this._calcDragShape(s.startShape)
+          shape: this._calcDragShape(s.startShape),
         }), this.state.layers),
       });
     }
   };
 
   _onUpdateShape = (id, shape) => {
-    console.log(id, shape)
+    console.log(id, shape);
     const index = findIndex(propEq('id', id), this.state.layers);
 
     this.setState({
