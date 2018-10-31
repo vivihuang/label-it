@@ -31,10 +31,10 @@ export default class LabelDemo extends React.Component {
         x: '',
         y: '',
       },
-      endPos: {
+      imageStartPos: {
         x: '',
         y: '',
-      }
+      },
     };
 
     this.points = [];
@@ -73,7 +73,7 @@ export default class LabelDemo extends React.Component {
     };
   };
 
-  _calcPos(e, ratio = 1) {
+  _calcWheelPos(e, ratio = 1) {
     const { x, y } = this.state.image;
     const svgRects = this._svg.current.getClientRects()[0];
     const cursorX = e.pageX - svgRects.x - x;
@@ -83,6 +83,13 @@ export default class LabelDemo extends React.Component {
       x: x + (cursorX - x) * ratio,
       y: y + (cursorY - y) * ratio,
     };
+  }
+
+  _calcDragPos(cursorPos) {
+    return {
+      x: this.state.imageStartPos.x + cursorPos[0] - this.state.startPos.x,
+      y: this.state.imageStartPos.y + cursorPos[1] - this.state.startPos.y,
+    }
   }
 
   _getCursorPos(e) {
@@ -107,7 +114,7 @@ export default class LabelDemo extends React.Component {
 
       this.setState({
         scale,
-        image: this._calcPos(e, ratio),
+        image: this._calcWheelPos(e, ratio),
       });
     }
   };
@@ -127,9 +134,13 @@ export default class LabelDemo extends React.Component {
         dragMode: true,
         startPos: {
           x: cursorPos[0],
-          y: cursorPos[1]
-        }
-      })
+          y: cursorPos[1],
+        },
+        imageStartPos: {
+          x: this.state.image.x,
+          y: this.state.image.y,
+        },
+      });
     }
   };
 
@@ -146,14 +157,9 @@ export default class LabelDemo extends React.Component {
         },
       });
     } else if (this.state.dragMode) {
-      if (this.state.startPos.x && this.state.startPos.y) {
-        this. setState({
-          image: {
-            x: cursorPos[0] - this.state.startPos.x,
-            y: cursorPos[1] - this.state.startPos.y
-          }
-        })
-      }
+      this.setState({
+        image: this._calcDragPos(cursorPos),
+      });
     }
   };
 
@@ -178,11 +184,8 @@ export default class LabelDemo extends React.Component {
     } else {
       this.setState({
         dragMode: false,
-        image: {
-          x: cursorPos[0] - this.state.startPos.x,
-          y: cursorPos[1] - this.state.startPos.y
-        }
-      })
+        image: this._calcDragPos(cursorPos),
+      });
     }
   };
 
@@ -247,6 +250,7 @@ export default class LabelDemo extends React.Component {
         <svg
           width={width}
           height={height}
+          style={{ margin: '20px 40px', border: '1px solid #000' }}
           onWheel={this._onWheel}
           onMouseDown={this._onMouseDown}
           onMouseUp={this._onMouseUp}
