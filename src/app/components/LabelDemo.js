@@ -99,7 +99,7 @@ export default class LabelDemo extends React.Component {
 
   _getCursorPos(e) {
     const svgRects = this._svg.current.getClientRects()[0];
-    return [e.pageX - svgRects.x, e.pageY - svgRects.y];
+    return [e.clientX - svgRects.x, e.clientY - svgRects.y];
   }
 
   _onWheel = (e) => {
