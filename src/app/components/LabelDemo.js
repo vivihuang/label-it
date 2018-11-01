@@ -198,7 +198,7 @@ export default class LabelDemo extends React.Component {
         },
         layers: [...this.state.layers, livingObject],
       });
-    } else {
+    } else if (this.state.dragMode) {
       this.setState({
         dragMode: false,
         image: this._calcDragPos(cursorPos),
