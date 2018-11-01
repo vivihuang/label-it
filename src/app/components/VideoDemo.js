@@ -1,14 +1,11 @@
 import React from 'react';
-import { map, addIndex, findIndex, propEq } from 'ramda';
-import Rectangle from './Rectangle';
-import { normalize } from '../../util/rect';
-import uuid from 'uuid';
+import { map, addIndex } from 'ramda';
+import LabelMask from './LabelMask';
 
 const videoStyle = {
   position: 'absolute',
   top: 0,
   left: 0,
-  margin: '20px 40px',
 };
 
 export default class VideoDemo extends React.Component {
@@ -22,13 +19,8 @@ export default class VideoDemo extends React.Component {
       editMode: false,
       width: 0,
       height: 0,
-      living: {
-        type: 'RECTANGLE',
-      },
-      layers: [],
     };
     this._video = React.createRef();
-    this._svg = React.createRef();
   }
 
   _onEditChange = (e) => {
@@ -108,77 +100,8 @@ export default class VideoDemo extends React.Component {
     this._video.current.addEventListener('timeupdate', seekWhenTimeUpdated);
   };
 
-  _getCursorPos = (e) => {
-    const svgRects = this._svg.current.getClientRects()[0];
-    return [e.clientX - svgRects.x, e.clientY - svgRects.y];
-  };
-
-  _onMouseDown = (e) => {
-    if (this.state.editMode) return;
-    if (this.state.drawMode) {
-      const cursorPos = this._getCursorPos(e);
-      this.setState({
-        living: {
-          ...this.state.living,
-          points: [...cursorPos, ...cursorPos],
-        },
-      });
-    }
-  };
-
-  _onMouseMove = (e) => {
-    if (!this.state.living.points) return;
-
-    if (this.state.drawMode) {
-      const cursorPos = this._getCursorPos(e);
-      const startPos = this.state.living.points.slice(0, 2);
-      this.setState({
-        living: {
-          ...this.state.living,
-          points: [...startPos, ...cursorPos],
-        },
-      });
-    }
-  };
-
-  _onMouseUp = (e) => {
-    if (!this.state.living.points) return;
-
-    if (this.state.drawMode) {
-      const cursorPos = this._getCursorPos(e);
-      const startPos = this.state.living.points.slice(0, 2);
-      const livingObject = {
-        type: this.state.living.type,
-        id: uuid(),
-        shape: normalize(...startPos, ...cursorPos),
-      };
-
-      this.setState({
-        living: {
-          type: 'RECTANGLE',
-        },
-        layers: [...this.state.layers, livingObject],
-      });
-    }
-  };
-
-  _onUpdateShape = (id, shape) => {
-    const index = findIndex(propEq('id', id), this.state.layers);
-
-    this.setState({
-      layers: [
-        ...this.state.layers.slice(0, index),
-        {
-          ...this.state.layers[index],
-          shape,
-        },
-        ...this.state.layers.slice(index + 1),
-      ],
-    });
-  };
-
   render() {
-    const { videoUrl, segments, recording, width, height } = this.state;
+    const { videoUrl, segments, recording, width, height, drawMode, editMode } = this.state;
     return (
       <div>
         <div>
@@ -212,33 +135,8 @@ export default class VideoDemo extends React.Component {
               <source src={videoUrl} type="video/mp4"/>
             </video>
           }
-          {
-            videoUrl &&
-            <svg
-              width={width}
-              height={height}
-              style={videoStyle}
-              onMouseDown={this._onMouseDown}
-              onMouseUp={this._onMouseUp}
-              onMouseMove={this._onMouseMove}
-              ref={this._svg}>
-              >
-              {
-                map((s) => <Rectangle
-                  shape={s.shape}
-                  key={s.id}
-                  editMode={this.state.editMode}
-                  onUpdateShape={(...args) => this._onUpdateShape(s.id, ...args)}
-                />, this.state.layers)
-              }
-              {
-                this.state.living
-                && this.state.living.type === 'RECTANGLE'
-                && this.state.living.points
-                && <Rectangle shape={normalize(...this.state.living.points)}/>
-              }
-            </svg>
-          }
+          {videoUrl &&
+          <LabelMask width={width} height={height} drawMode={drawMode} editMode={editMode} customStyle={videoStyle} />}
         </div>
         {
           addIndex(map)(([startTime, endTime], index) => <div key={index}>
