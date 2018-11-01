@@ -1,5 +1,5 @@
 import React from 'react';
-import {isEmpty, map, addIndex} from 'ramda';
+import { isEmpty, map, addIndex } from 'ramda';
 
 export default class VideoDemo extends React.Component {
   constructor(props) {
@@ -7,49 +7,50 @@ export default class VideoDemo extends React.Component {
     this.state = {
       videoUrl: null,
       segments: [],
-      recording: false
+      recording: false,
     };
     this._video = React.createRef();
   }
 
   _onSelectFile = (e) => {
     this.setState({
-      videoUrl: URL.createObjectURL(e.target.files[0])
+      videoUrl: URL.createObjectURL(e.target.files[0]),
     });
-  }
+  };
 
   _onStartRecord = (e) => {
     this.setState({
       segments: [...this.state.segments, [this._video.current.currentTime, this._video.current.duration]],
-      recording: true
+      recording: true,
     });
-  }
+  };
 
   _onStopRecord = (e) => {
     const [startTime] = this.state.segments.pop();
     this.setState({
       segments: [...this.state.segments, [startTime, this._video.current.currentTime]],
-      recording: false
+      recording: false,
     });
-  }
+  };
 
   _onUpdateTime = (e, index, isStart) => {
-    const {segments} = this.state;
+    const { segments } = this.state;
     this.setState({
       segments: [
         ...segments.slice(0, index),
         isStart ? [parseFloat(e.target.value), segments[index][1]] : [segments[index][0], parseFloat(e.target.value)],
-        ...segments.slice(index + 1)
-      ]
+        ...segments.slice(index + 1),
+      ],
     });
-  }
+  };
 
   _onPreview = (e) => {
-    const {segments} = this.state;
+    const { segments } = this.state;
     let index = 0;
     this._video.current.currentTime = segments[index][0];
     this._video.current.play();
-    function seekWhenTimeUpdated (e) {
+
+    function seekWhenTimeUpdated(e) {
       if (e.target.currentTime >= segments[index][1]) {
         index += 1;
         if (index >= segments.length) {
@@ -60,14 +61,15 @@ export default class VideoDemo extends React.Component {
         }
       }
     }
+
     const removeListener = () => {
       this._video.current.removeEventListener('timeupdate', seekWhenTimeUpdated);
-    }
+    };
     this._video.current.addEventListener('timeupdate', seekWhenTimeUpdated);
-  }
+  };
 
   render() {
-    const {videoUrl, segments, recording} = this.state;
+    const { videoUrl, segments, recording } = this.state;
     return (
       <div>
         <div>
@@ -78,17 +80,19 @@ export default class VideoDemo extends React.Component {
           </ol>
         </div>
         <div>
-          <input type="file" onChange={this._onSelectFile} />
+          <input type="file" onChange={this._onSelectFile}/>
           {
-            recording ? <button onClick={this._onStopRecord}>Stop Record</button> : <button onClick={this._onStartRecord}>Start Record</button>
+            recording ? <button onClick={this._onStopRecord}>Stop Record</button> :
+              <button onClick={this._onStartRecord}>Start Record</button>
           }
           <button style={{
-            marginLeft: 20
-          }} onClick={this._onPreview}>Preview</button>
+            marginLeft: 20,
+          }} onClick={this._onPreview}>Preview
+          </button>
         </div>
         {
-          videoUrl && <video width="1280" height="720" ref={this._video} controls>
-            <source src={videoUrl} type="video/mp4" />
+          videoUrl && <video ref={this._video} controls style={{ margin: '20px 40px' }}>
+            <source src={videoUrl} type="video/mp4"/>
           </video>
         }
         {
