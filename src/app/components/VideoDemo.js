@@ -125,6 +125,8 @@ export default class VideoDemo extends React.Component {
             <li>选择一个视频文件，并开始播放</li>
             <li>点击 start record 开始截取，再次点击停止截取，可循环选择</li>
             <li>点击 preview 开始预览</li>
+            <li>勾选draw mode后可在视频区域拖动绘制矩形</li>
+            <li>勾选edit mode可编辑已创建的矩形</li>
           </ol>
         </div>
         <div>
