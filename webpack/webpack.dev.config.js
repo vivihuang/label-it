@@ -10,7 +10,7 @@ module.exports = {
     historyApiFallback: true,
     port: 40021,
     host: '0.0.0.0',
-    disableHostCheck: true
+    disableHostCheck: true,
   },
   ...webpackConfig,
 };
