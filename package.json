@@ -10,7 +10,7 @@
     "prebuild": "yarn build:clean",
     "build": "webpack --config webpack/webpack.prod.config.js --color -p --progress --hide-modules --display-optimization-bailout",
     "build:clean": "rimraf ./dist",
-    "server": "pm2 serve ./dist 40021"
+    "server": "yarn build && pm2 serve ./dist 40021"
   },
   "author": "",
   "license": "ISC",
