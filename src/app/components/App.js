@@ -1,5 +1,6 @@
 import React from "react";
 import { BrowserRouter as Router, Route, Link, Switch } from "react-router-dom";
+import "../../../node_modules/video-react/dist/video-react.css";
 
 import LabelDemo from './LabelDemo';
 import VideoDemo from './VideoDemo';
@@ -24,9 +25,9 @@ const App = () => (
       </nav>
 
       <Switch>
-        <Route path="/" exact component={Index} />
-        <Route path="/video-split-demo" component={VideoDemo} />
-        <Route path="/label-demo" component={LabelDemo} />
+        <Route path="/" exact component={Index}/>
+        <Route path="/video-split-demo" component={VideoDemo}/>
+        <Route path="/label-demo" component={LabelDemo}/>
       </Switch>
     </div>
   </Router>

@@ -1,6 +1,9 @@
 import React from 'react';
 import { map, addIndex } from 'ramda';
+import { Player, ControlBar } from 'video-react';
+
 import LabelMask from './LabelMask';
+import './video.css';
 
 const videoStyle = {
   position: 'absolute',
@@ -9,19 +12,17 @@ const videoStyle = {
 };
 
 export default class VideoDemo extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      videoUrl: null,
-      segments: [],
-      recording: false,
-      drawMode: false,
-      editMode: false,
-      width: 0,
-      height: 0,
-    };
-    this._video = React.createRef();
-  }
+  _video = React.createRef();
+
+  state = {
+    videoUrl: null,
+    segments: [],
+    recording: false,
+    drawMode: false,
+    editMode: false,
+    width: 0,
+    height: 0,
+  };
 
   _onEditChange = (e) => {
     this.setState({
@@ -36,8 +37,8 @@ export default class VideoDemo extends React.Component {
   };
 
   _dataLoaded = () => {
-    const width = this._video && this._video.current ? this._video.current.clientWidth : 0;
-    const height = this._video && this._video.current ? this._video.current.clientHeight : 0;
+    const width = this._video && this._video.current ? this._video.current.videoWidth : 0;
+    const height = this._video && this._video.current ? this._video.current.videoHeight : 0;
     this.setState({
       width,
       height,
@@ -128,15 +129,22 @@ export default class VideoDemo extends React.Component {
             </div>
           )}
         </div>
-        <div style={{ position: 'relative' }}>
+        <div style={{ position: 'relative', margin: '20px 40px' }} data-vjs-player>
           {
             videoUrl &&
-            <video ref={this._video} controls style={{ margin: '20px 40px' }} onLoadedData={this._dataLoaded}>
-              <source src={videoUrl} type="video/mp4"/>
-            </video>
+            <Player
+              ref={this._video}
+              src={videoUrl}
+              width={width}
+              height={height}
+              onLoadedData={this._dataLoaded}
+              fluid={false}
+            >
+              <ControlBar autoHide={false}/>
+            </Player>
           }
           {videoUrl &&
-          <LabelMask width={width} height={height} drawMode={drawMode} editMode={editMode} customStyle={videoStyle} />}
+          <LabelMask width={width} height={height} drawMode={drawMode} editMode={editMode} customStyle={videoStyle}/>}
         </div>
         {
           addIndex(map)(([startTime, endTime], index) => <div key={index}>

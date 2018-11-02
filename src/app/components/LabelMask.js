@@ -86,13 +86,11 @@ export default class LabelMask extends Component {
 
   render() {
     const { width = 0, height = 0, editMode, customStyle = {} } = this.props;
-    console.log(this.state.layers)
-    const svgStyle = Object.assign({}, { margin: '20px 40px' }, customStyle)
     return (
       <svg
         width={width}
         height={height}
-        style={svgStyle}
+        style={customStyle}
         onMouseDown={this._onMouseDown}
         onMouseUp={this._onMouseUp}
         onMouseMove={this._onMouseMove}

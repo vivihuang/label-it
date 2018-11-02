@@ -1,0 +1,9 @@
+.video-react .video-react-big-play-button {
+    display: none;
+}
+
+.video-react .video-react-control-bar {
+    display: flex;
+    bottom: -3em;
+    z-index: 999;
+}
