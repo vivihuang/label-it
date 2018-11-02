@@ -3,7 +3,8 @@ import { map, addIndex } from 'ramda';
 import { Player, ControlBar } from 'video-react';
 
 import LabelMask from './LabelMask';
-import './video.css';
+import '../styles/video-react.css';
+import '../styles/video.css';
 
 const videoStyle = {
   position: 'absolute',

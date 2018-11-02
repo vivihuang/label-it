@@ -1,6 +1,5 @@
 import React from "react";
 import { BrowserRouter as Router, Route, Link, Switch } from "react-router-dom";
-import "../../../node_modules/video-react/dist/video-react.css";
 
 import LabelDemo from './LabelDemo';
 import VideoDemo from './VideoDemo';
