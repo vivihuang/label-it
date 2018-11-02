@@ -23,6 +23,7 @@ export default class LabelMask extends Component {
   _onMouseDown = (e) => {
     if (this.props.editMode) return;
     if (this.props.drawMode) {
+      this.props.onMouseDown();
       const cursorPos = this._getCursorPos(e);
       this.setState({
         living: {

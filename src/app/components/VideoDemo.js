@@ -116,6 +116,10 @@ export default class VideoDemo extends React.Component {
     }, 500);
   };
 
+  _pauseVideo = () => {
+    this._video.current.pause();
+  };
+
   render() {
     const { videoUrl, segments, recording, width, height, drawMode, editMode } = this.state;
     const enablePreview = Array.isArray(segments) && segments.length > 0;
@@ -162,7 +166,13 @@ export default class VideoDemo extends React.Component {
             </Player>
           }
           {videoUrl &&
-          <LabelMask width={width} height={height} drawMode={drawMode} editMode={editMode} customStyle={videoStyle}/>}
+          <LabelMask
+            width={width}
+            height={height}
+            drawMode={drawMode}
+            editMode={editMode}
+            customStyle={videoStyle}
+            onMouseDown={this._pauseVideo}/>}
         </div>
         {
           addIndex(map)(([startTime, endTime], index) => <div key={index}>
