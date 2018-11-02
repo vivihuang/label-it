@@ -15,7 +15,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "pm2": "^3.2.2",
     "ramda": "^0.25.0",
     "react": "^16.4.2",
     "react-dom": "^16.4.2",
@@ -54,6 +53,7 @@
     "css-loader": "^1.0.0",
     "html-webpack-plugin": "^3.2.0",
     "mocha": "^5.2.0",
+    "pm2": "^3.2.2",
     "rimraf": "^2.6.2",
     "source-map-loader": "^0.2.3",
     "style-loader": "^0.23.1",
