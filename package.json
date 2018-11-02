@@ -5,15 +5,17 @@
   "main": "",
   "browserslist": "> 0.25%, not dead",
   "scripts": {
-    "dev": "webpack-dev-server --config webpack/webpack.dev.config.js",
+    "start": "webpack-dev-server --config webpack/webpack.dev.config.js",
     "lint": "tslint src/**/*.js{,x}",
     "prebuild": "yarn build:clean",
     "build": "webpack --config webpack/webpack.prod.config.js --color -p --progress --hide-modules --display-optimization-bailout",
-    "build:clean": "rimraf ./dist"
+    "build:clean": "rimraf ./dist",
+    "server": "pm2 serve ./dist 40021"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "pm2": "^3.2.2",
     "ramda": "^0.25.0",
     "react": "^16.4.2",
     "react-dom": "^16.4.2",
