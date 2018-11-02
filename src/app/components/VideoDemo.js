@@ -13,6 +13,7 @@ const videoStyle = {
 
 export default class VideoDemo extends React.Component {
   _video = React.createRef();
+  timer = null;
 
   state = {
     videoUrl: null,
@@ -22,6 +23,11 @@ export default class VideoDemo extends React.Component {
     editMode: false,
     width: 0,
     height: 0,
+  };
+
+  getCurrentPlayer = () => {
+    const { player } = this._video.current.getState();
+    return player;
   };
 
   _onEditChange = (e) => {
@@ -52,16 +58,18 @@ export default class VideoDemo extends React.Component {
   };
 
   _onStartRecord = (e) => {
+    const player = this.getCurrentPlayer();
     this.setState({
-      segments: [...this.state.segments, [this._video.current.currentTime, this._video.current.duration]],
+      segments: [...this.state.segments, [player.currentTime, player.duration]],
       recording: true,
     });
   };
 
   _onStopRecord = (e) => {
+    const player = this.getCurrentPlayer();
     const [startTime] = this.state.segments.pop();
     this.setState({
-      segments: [...this.state.segments, [startTime, this._video.current.currentTime]],
+      segments: [...this.state.segments, [startTime, player.currentTime]],
       recording: false,
     });
   };
@@ -77,32 +85,39 @@ export default class VideoDemo extends React.Component {
     });
   };
 
-  _onPreview = (e) => {
+  _stopPreview = () => {
+    this._video.current.pause();
+    window.clearInterval(this.timer);
+  };
+
+  _onPreview = () => {
     const { segments } = this.state;
+    const startTime = segments[0][0];
+    const endTime = segments[segments.length - 1][1];
+
     let index = 0;
-    this._video.current.currentTime = segments[index][0];
+    this._video.current.seek(startTime);
     this._video.current.play();
 
-    function seekWhenTimeUpdated(e) {
-      if (e.target.currentTime >= segments[index][1]) {
+    this.timer = window.setInterval(() => {
+      const player = this.getCurrentPlayer();
+      if (player.currentTime > endTime) {
+        this._stopPreview();
+      }
+      if (player.currentTime >= segments[index][1]) {
         index += 1;
         if (index >= segments.length) {
-          e.target.pause();
-          removeListener();
+          this._stopPreview();
         } else {
-          e.target.currentTime = segments[index][0];
+          this._video.current.seek(segments[index][0]);
         }
       }
-    }
-
-    const removeListener = () => {
-      this._video.current.removeEventListener('timeupdate', seekWhenTimeUpdated);
-    };
-    this._video.current.addEventListener('timeupdate', seekWhenTimeUpdated);
+    }, 500);
   };
 
   render() {
     const { videoUrl, segments, recording, width, height, drawMode, editMode } = this.state;
+    const enablePreview = Array.isArray(segments) && segments.length > 0;
     return (
       <div>
         <div>
@@ -122,14 +137,14 @@ export default class VideoDemo extends React.Component {
               }
               <button style={{
                 marginLeft: 20,
-              }} onClick={this._onPreview}>Preview
+              }} onClick={this._onPreview} disabled={!enablePreview}>Preview
               </button>
               <input type="checkbox" name="drawable" onChange={this._onDrawChange}/> draw mode
               <input type="checkbox" name="editable" onChange={this._onEditChange}/> edit mode
             </div>
           )}
         </div>
-        <div style={{ position: 'relative', margin: '20px 40px' }} data-vjs-player>
+        <div style={{ position: 'relative', margin: '20px 40px 40px' }} data-vjs-player>
           {
             videoUrl &&
             <Player
